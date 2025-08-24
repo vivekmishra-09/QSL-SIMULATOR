@@ -1,3 +1,10 @@
+/*
+ * Quantum Signal Loss (QSL) Simulator
+ * Copyright (c) 2025 Vivek Mishra - All Rights Reserved
+ * Unauthorized copying, modification, distribution, or use of this code,
+ * in whole or in part, is strictly prohibited.
+ * For permissions, contact: [your email or GitHub link]
+ */
 // === CONSTANTS ===
 const LIGHT_SPEED = 299792.458; // km/s
 const EARTH_MARS_AVG_DISTANCE = 225000000; // km
