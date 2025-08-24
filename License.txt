@@ -1,1 +1,18 @@
-© Vivek Mishra, 2025. All rights reserved. This work is made available for viewing only. No reuse, reproduction, or modification is permitted without explicit written permission from the author.
+All Rights Reserved
+
+Copyright (c) 2025 Vivek Mishra
+
+This work and all associated files are protected under international copyright law.  
+Unauthorized copying, modification, distribution, or use of this work, in whole or in part,  
+is strictly prohibited without the prior written permission of the copyright holder.  
+
+Permissions granted:
+- Viewing the code within this repository for personal, non-commercial reference only.  
+
+Restrictions:
+- No permission is granted to copy, modify, merge, publish, distribute, sublicense,  
+  and/or sell copies of the software or its components.  
+- No derivative works may be created.  
+- No commercial or academic use is permitted without explicit written authorization.  
+
+Any unauthorized use may result in legal action.  
