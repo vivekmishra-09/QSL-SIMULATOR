@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Vivek Mishra - All Rights Reserved
  * Unauthorized copying, modification, distribution, or use of this code,
  * in whole or in part, is strictly prohibited.
- * For permissions, contact: [your email or GitHub link]
+ * For permissions, contact: [vivekmishra.space@gmail.com]
  */
 // === CONSTANTS ===
 const LIGHT_SPEED = 299792.458; // km/s
