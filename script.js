@@ -112,4 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
 
+// 
+    const counterDisplay = document.querySelector(".counter-display");
+    let visitCount = localStorage.getItem("page_view");
+
+    if (visitCount) {
+        visitCount = Number(visitCount) + 1;
+    } else {
+        visitCount = 1;
+    }
+    localStorage.setItem("page_view", visitCount);
+    counterDisplay.textContent = visitCount;
 
