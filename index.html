@@ -7,31 +7,18 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-  <p>You have visited this page <span id="counter">0</span> times.</p>
+<!--  -->
+    <p>Total Visitors: <span id="counter">0</span></p>
 
   <script>
-    // Get the current count from localStorage
-    let count = localStorage.getItem('visitCount');
-
-    // If null, initialize to 0
-    if (!count) {
-      count = 0;
-    }
-
-    // Increment the count
-    count = parseInt(count) + 1;
-
-    // Store the new count
-    localStorage.setItem('visitCount', count);
-
-    // Display the count
-    document.getElementById('counter').innerText = count;
+    // Use CountAPI to get & increment counter
+    fetch('https://api.countapi.xyz/hit/observer33/mywebsite')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('counter').innerText = data.value;
+      });
   </script>
-</body>
-</html>
 <!--  -->
-
     
     <button id="themeToggle">Switch Theme</button>
     <header style="text-align: center; padding: 30px 20px;">
