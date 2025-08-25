@@ -8,9 +8,33 @@
 </head>
 <body>
 
-  <a href='http://www.freevisitorcounters.com'>freevisitorcounterss Homepage</a> <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=20a94d27d3eae1ed24ad11c3169749f6c25a0a71'></script>
-<script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1380856/t/13"></script>
+  <p>You have visited this page <span id="counter">0</span> times.</p>
 
+  <script>
+    // Get the current count from localStorage
+    let count = localStorage.getItem('visitCount');
+
+    // If null, initialize to 0
+    if (!count) {
+      count = 0;
+    }
+
+    // Increment the count
+    count = parseInt(count) + 1;
+
+    // Store the new count
+    localStorage.setItem('visitCount', count);
+
+    // Display the count
+    document.getElementById('counter').innerText = count;
+  </script>
+</body>
+</html>
+<!--  -->
+
+    
+<!--   <a href='http://www.freevisitorcounters.com'>freevisitorcounterss Homepage</a> <script type='text/javascript' src='https://www.freevisitorcounters.com/auth.php?id=20a94d27d3eae1ed24ad11c3169749f6c25a0a71'></script>
+<script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1380856/t/13"></script> -->
     
     <button id="themeToggle">Switch Theme</button>
     <header style="text-align: center; padding: 30px 20px;">
