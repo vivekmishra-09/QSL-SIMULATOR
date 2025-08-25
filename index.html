@@ -7,18 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!--  -->
-    <p>Total Visitors: <span id="counter">0</span></p>
-
-  <script>
-    // Use CountAPI to get & increment counter
-    fetch('https://api.countapi.xyz/hit/https://qsl-simulator.vercel.app//mywebsite')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('counter').innerText = data.value;
-      });
-  </script>
-<!--  -->
+    
     
     <button id="themeToggle">Switch Theme</button>
     <header style="text-align: center; padding: 30px 20px;">
