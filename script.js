@@ -113,12 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Visitor Counte
-if (!localStorage.getItem("visited_qsl")) {
-    let count = localStorage.getItem("uniqueVisitorCount_qsl") || 0;
-    count++;
-    localStorage.setItem("uniqueVisitorCount_qsl", count);
-    localStorage.setItem("visited_qsl", true);
-  }
-  document.getElementById("visitorCount").textContent =
-    localStorage.getItem("uniqueVisitorCount_qsl");
+  fetch('https://api.countapi.xyz/hit/qsl-visitor-counter/vivekmishra')
+    .then(res => res.json())
+    .then(res => {
+      document.getElementById('visitorCounter').textContent = res.value;
+    });
 
