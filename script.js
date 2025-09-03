@@ -110,5 +110,15 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("theme", newTheme);
     });
   });
-  
+
+
+// Visitor Counte
+if (!localStorage.getItem("visited_qsl")) {
+    let count = localStorage.getItem("uniqueVisitorCount_qsl") || 0;
+    count++;
+    localStorage.setItem("uniqueVisitorCount_qsl", count);
+    localStorage.setItem("visited_qsl", true);
+  }
+  document.getElementById("visitorCount").textContent =
+    localStorage.getItem("uniqueVisitorCount_qsl");
 
