@@ -112,10 +112,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-// Visitor Counte
-  fetch('https://api.countapi.xyz/hit/qsl-visitor-counter/vivekmishra')
-    .then(res => res.json())
-    .then(res => {
-      document.getElementById('visitorCounter').textContent = res.value;
-    });
+
 
