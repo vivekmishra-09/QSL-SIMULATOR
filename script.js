@@ -68,10 +68,11 @@ function deepSpaceProbeData() {
     const qsu = 1 - qsl;  // QSU = Quantum Signal Utility
     const qslHTML = `<div class="qsl-highlight">💠 <strong>QSL (Quantum Signal Loss):</strong> ${qsl.toFixed(6)}</div>`;
 
-    // Doppler Calculation
-    const baseDoppler = SIGNAL_FREQUENCY * ((LIGHT_SPEED - PROBE_VELOCITY) / LIGHT_SPEED);
-    const dynamicVelocity = PROBE_VELOCITY + Math.sin(Date.now() / 10000000) * 2;
-    const dopplerShift = SIGNAL_FREQUENCY * ((LIGHT_SPEED - dynamicVelocity) / LIGHT_SPEED);
+    // ✅ Correct Doppler Calculation (non-relativistic)
+    const dynamicVelocity = PROBE_VELOCITY + Math.sin(Date.now() / 10000000) * 2; // km/s
+    const dopplerShift = SIGNAL_FREQUENCY * (1 - dynamicVelocity / LIGHT_SPEED);
+
+    const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
     const dopplerDelta = Math.abs(dopplerShift - baseDoppler);
 
     // Anomaly Detection
@@ -91,6 +92,7 @@ function deepSpaceProbeData() {
     `;
     document.getElementById("deep-space-data").innerHTML = dataHTML;
 }
+
 
 setInterval(getMarsOrbiterData, 5000);
 setInterval(deepSpaceProbeData, 15000);
