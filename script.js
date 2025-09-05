@@ -9,7 +9,7 @@
 const LIGHT_SPEED = 299792.458; // km/s
 const EARTH_MARS_AVG_DISTANCE = 225000000; // km
 const MARS_ATMOSPHERIC_LOSS = 0.04;
-const EARTH_TO_PROBE_DISTANCE = 1470000000; // km
+const EARTH_TO_PROBE_DISTANCE = 9140000000; // km
 const MARS_VELOCITY = 24; // km/s (approx)
 const PROBE_VELOCITY = 15; // km/s (deep space probe)
 const SIGNAL_FREQUENCY = 8.4e9; // Hz
