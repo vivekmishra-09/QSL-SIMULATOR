@@ -31,8 +31,12 @@ function getMarsOrbiterData() {
     // Atmospheric signal degradation model
     let signalStrength = (100 - (distance * MARS_ATMOSPHERIC_LOSS / 10000000)).toFixed(2);
 
-    // Doppler effect (receiver is moving away, redshift)
-    let dopplerShift = SIGNAL_FREQUENCY * ((LIGHT_SPEED - MARS_VELOCITY) / LIGHT_SPEED);
+    // Doppler Calculation (received frequency)
+    const dynamicVelocity = MARS_VELOCITY + Math.sin(Date.now() / 5000000) * 0.5; // km/s
+    const receivedFreq = SIGNAL_FREQUENCY * (1 - dynamicVelocity / LIGHT_SPEED); // Hz
+
+    // Real Doppler shift Δf
+    const deltaF = receivedFreq - SIGNAL_FREQUENCY; // Hz (negative if receding)
 
     // Status condition
     let anomaly = (rawInterference > 8.0) ? "⚠️ UNKNOWN SIGNAL DETECTED" : "✅ Normal Transmission";
@@ -43,7 +47,8 @@ function getMarsOrbiterData() {
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
         📶 <strong>Signal Strength:</strong> ${signalStrength} % <br>
         📡 <strong>Interference:</strong> ${interference} dB <br>
-        📈 <strong>Doppler Shift:</strong> ${dopplerShift.toFixed(2)} Hz <br>
+        📈 <strong>Received Frequency:</strong> ${receivedFreq.toFixed(2)} Hz <br>
+        📊 <strong>Doppler Shift Δf:</strong> ${deltaF.toFixed(0)} Hz <br>
         🕒 <strong>Last Updated:</strong> ${new Date().toUTCString()}<br>
         🔵 <strong>Status:</strong> ${anomaly}
     `;
