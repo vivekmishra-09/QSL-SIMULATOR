@@ -68,14 +68,17 @@ function deepSpaceProbeData() {
     const qsu = 1 - qsl;  // QSU = Quantum Signal Utility
     const qslHTML = `<div class="qsl-highlight">💠 <strong>QSL (Quantum Signal Loss):</strong> ${qsl.toFixed(6)}</div>`;
 
-    // ✅ Correct Doppler Calculation (non-relativistic)
+    // Doppler Calculation (received frequency)
     const dynamicVelocity = PROBE_VELOCITY + Math.sin(Date.now() / 10000000) * 2; // km/s
-    const dopplerShift = SIGNAL_FREQUENCY * (1 - dynamicVelocity / LIGHT_SPEED);
+    const receivedFreq = SIGNAL_FREQUENCY * (1 - dynamicVelocity / LIGHT_SPEED); // Hz
 
-    const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
-    const dopplerDelta = Math.abs(dopplerShift - baseDoppler);
+    // Real Doppler shift Δf
+    const deltaF = receivedFreq - SIGNAL_FREQUENCY; // Hz (negative for receding)
 
     // Anomaly Detection
+    const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
+    const dopplerDelta = Math.abs(receivedFreq - baseDoppler);
+
     const anomaly = (qsl > 0.85 && dopplerDelta > 1e8)
         ? "⚠️ Signal Disruption Detected"
         : "✅ Signal Stable";
@@ -86,13 +89,13 @@ function deepSpaceProbeData() {
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
         ${qslHTML}<br>
         🧿 <strong>QSU (Quantum Signal Utility):</strong> ${qsu.toFixed(6)} <br>
-        📈 <strong>Doppler Shift:</strong> ${dopplerShift.toFixed(2)} Hz <br>
+        📈 <strong>Received Frequency:</strong> ${receivedFreq.toFixed(2)} Hz <br>
+        📊 <strong>Doppler Shift Δf:</strong> ${deltaF.toFixed(0)} Hz <br>
         🕒 <strong>Last Updated:</strong> ${new Date().toUTCString()}<br>
         🔵 <strong>Status:</strong> ${anomaly}
     `;
     document.getElementById("deep-space-data").innerHTML = dataHTML;
 }
-
 
 setInterval(getMarsOrbiterData, 5000);
 setInterval(deepSpaceProbeData, 15000);
