@@ -1,20 +1,18 @@
 /*
  * Quantum Signal Loss (QSL) Simulator - Improved Version
  * Core logic by Vivek Mishra (unchanged)
- * Minor scientific + data upgrades applied
  */
 
 // === CONSTANTS ===
 const LIGHT_SPEED = 299792.458; // km/s
 const EARTH_MARS_AVG_DISTANCE = 225000000; // km
 const MARS_ATMOSPHERIC_LOSS = 0.04;
-const EARTH_TO_PROBE_DISTANCE = 9140000000; // km
 const MARS_VELOCITY = 24; // km/s
 const PROBE_VELOCITY = 15; // km/s
 const SIGNAL_FREQUENCY = 8.4e9; // Hz
 
 // === BASE QSL PARAMETER ===
-const BASE_LAMBDA = 3.6e-7; // From your paper calibration
+const BASE_LAMBDA = 3.6e-7;
 
 // === REAL DATA STORAGE ===
 let DSN_DATA = null;
@@ -32,16 +30,29 @@ async function fetchDSNData() {
 
 // === DYNAMIC LAMBDA FUNCTION ===
 function computeLambda(distance, interference) {
-    // Small variation based on environment
     let variation = (interference / 100) * 1e-7;
     let distanceFactor = distance / 1e10;
-
     return BASE_LAMBDA + variation * distanceFactor;
 }
 
-// === CONTROLLED NOISE (NOT RANDOM CHAOS) ===
+// === CONTROLLED NOISE ===
 function getControlledNoise() {
-    return 5 + Math.sin(Date.now() / 2000) * 3; // smooth variation
+    return 5 + Math.sin(Date.now() / 2000) * 3;
+}
+
+// === REALISTIC PROBE DISTANCE MODEL ===
+function getRealProbeDistance() {
+    const baseDistance = 2.47e10; // Voyager-like distance (km)
+    const velocity = 17; // km/s
+
+    const timeSeconds = Date.now() / 1000;
+
+    let distance = baseDistance + (velocity * timeSeconds);
+
+    // small perturbation
+    distance += Math.sin(timeSeconds / 50000) * 5e6;
+
+    return distance;
 }
 
 // === MARS ORBITER FUNCTION ===
@@ -75,10 +86,10 @@ function getMarsOrbiterData() {
     document.getElementById("mars-data").innerHTML = dataHTML;
 }
 
-// === DEEP SPACE FUNCTION ===
+// === DEEP SPACE FUNCTION (UPDATED) ===
 function deepSpaceProbeData() {
 
-    let distance = EARTH_TO_PROBE_DISTANCE;
+    let distance = getRealProbeDistance(); // 🔥 REAL MOTION
     let signalDelay = distance / LIGHT_SPEED;
     let signalTime = signalDelay.toFixed(6);
 
@@ -120,7 +131,7 @@ fetchDSNData();
 setInterval(getMarsOrbiterData, 5000);
 setInterval(deepSpaceProbeData, 15000);
 
-// === THEME (UNCHANGED) ===
+// === THEME ===
 document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.getElementById("themeToggle");
     const currentTheme = localStorage.getItem("theme") || "light";
