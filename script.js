@@ -1,30 +1,33 @@
 /*
- * Quantum Signal Loss (QSL) Simulator - Improved Version
+ * Quantum Signal Loss (QSL) Simulator - Real Voyager Integrated
  * Core logic by Vivek Mishra (unchanged)
  */
 
 // === CONSTANTS ===
 const LIGHT_SPEED = 299792.458; // km/s
-const EARTH_MARS_AVG_DISTANCE = 225000000; // km
+const EARTH_MARS_AVG_DISTANCE = 225000000;
 const MARS_ATMOSPHERIC_LOSS = 0.04;
-const MARS_VELOCITY = 24; // km/s
-const PROBE_VELOCITY = 15; // km/s
-const SIGNAL_FREQUENCY = 8.4e9; // Hz
+const MARS_VELOCITY = 24;
+const PROBE_VELOCITY = 15;
+const SIGNAL_FREQUENCY = 8.4e9;
 
 // === BASE QSL PARAMETER ===
 const BASE_LAMBDA = 3.6e-7;
 
 // === REAL DATA STORAGE ===
-let DSN_DATA = null;
+let REAL_DISTANCE = null;
 
-// === FETCH NASA DSN DATA ===
-async function fetchDSNData() {
+// === FETCH REAL VOYAGER DATA (Vercel API) ===
+async function updateVoyagerDistance() {
     try {
-        const res = await fetch("https://eyes.nasa.gov/dsn/data/dsn.json");
+        const res = await fetch("/api/voyager");
         const data = await res.json();
-        DSN_DATA = data;
+
+        if (data.distance) {
+            REAL_DISTANCE = data.distance;
+        }
     } catch (err) {
-        console.warn("DSN fetch failed, using fallback simulation");
+        console.warn("Voyager fetch failed, fallback active");
     }
 }
 
@@ -40,33 +43,31 @@ function getControlledNoise() {
     return 5 + Math.sin(Date.now() / 2000) * 3;
 }
 
-// === REALISTIC PROBE DISTANCE MODEL (FIXED) ===
-function getRealProbeDistance() {
-    const baseDistance = 2.47e10; // km (Voyager-like)
-    const velocity = 17; // km/s
-
-    const baseTime = 1700000000000; // fixed reference time
+// === FALLBACK PROBE MODEL (only if API fails) ===
+function getFallbackDistance() {
+    const baseDistance = 2.47e10;
+    const velocity = 17;
+    const baseTime = 1700000000000;
     const t = (Date.now() - baseTime) / 1000;
 
-    // linear outward motion
     let distance = baseDistance + (velocity * t);
-
-    // positive-only perturbation (no backward motion)
     let perturb = Math.abs(Math.sin(t / 50000)) * 5e5;
 
-    distance += perturb;
-
-    return distance;
+    return distance + perturb;
 }
 
-// === MARS ORBITER FUNCTION ===
-function getMarsOrbiterData() {
+// === FINAL DISTANCE FUNCTION ===
+function getRealProbeDistance() {
+    if (REAL_DISTANCE) return REAL_DISTANCE;
+    return getFallbackDistance();
+}
 
+// === MARS FUNCTION ===
+function getMarsOrbiterData() {
     let distance = EARTH_MARS_AVG_DISTANCE + (Math.sin(Date.now() / 5000000) * 5000000);
     let signalTime = (distance / LIGHT_SPEED).toFixed(6);
 
     let interference = getControlledNoise().toFixed(2);
-
     let signalStrength = (100 - (distance * MARS_ATMOSPHERIC_LOSS / 10000000)).toFixed(2);
 
     const dynamicVelocity = MARS_VELOCITY + Math.sin(Date.now() / 5000000) * 0.5;
@@ -77,7 +78,7 @@ function getMarsOrbiterData() {
         ? "⚠️ Possible Signal Disturbance"
         : "✅ Normal Transmission";
 
-    let dataHTML = `
+    document.getElementById("mars-data").innerHTML = `
         🛰️ <strong>Distance:</strong> ${distance.toFixed(2)} km <br>
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
         📶 <strong>Signal Strength:</strong> ${signalStrength} % <br>
@@ -87,10 +88,9 @@ function getMarsOrbiterData() {
         🕒 <strong>Last Updated:</strong> ${new Date().toUTCString()}<br>
         🔵 <strong>Status:</strong> ${anomaly}
     `;
-    document.getElementById("mars-data").innerHTML = dataHTML;
 }
 
-// === DEEP SPACE FUNCTION (REAL PHYSICS - FINAL) ===
+// === DEEP SPACE FUNCTION (REAL DATA) ===
 function deepSpaceProbeData() {
 
     let distance = getRealProbeDistance();
@@ -98,13 +98,11 @@ function deepSpaceProbeData() {
     let signalTime = signalDelay.toFixed(6);
 
     let interference = getControlledNoise();
-
     let lambda = computeLambda(distance, interference);
 
     let qsl = 1 - Math.exp(-lambda * signalDelay);
     let qsu = Math.exp(-lambda * signalDelay);
 
-    // realistic small velocity variation
     const velocityVariation = Math.sin(Date.now() / 20000000) * 0.5;
     const effectiveVelocity = PROBE_VELOCITY + velocityVariation;
 
@@ -118,7 +116,7 @@ function deepSpaceProbeData() {
         ? "⚠️ Signal Disruption Detected"
         : "✅ Signal Stable";
 
-    const dataHTML = `
+    document.getElementById("deep-space-data").innerHTML = `
         📡 <strong>Distance:</strong> ${distance.toFixed(2)} km <br>
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
         💠 <strong>QSL:</strong> ${qsl.toFixed(6)} <br>
@@ -128,14 +126,12 @@ function deepSpaceProbeData() {
         🕒 <strong>Last Updated:</strong> ${new Date().toUTCString()}<br>
         🔵 <strong>Status:</strong> ${anomaly}
     `;
-
-    document.getElementById("deep-space-data").innerHTML = dataHTML;
 }
 
 // === INIT ===
-fetchDSNData();
 setInterval(getMarsOrbiterData, 5000);
 setInterval(deepSpaceProbeData, 15000);
+setInterval(updateVoyagerDistance, 10000);
 
 // === THEME ===
 document.addEventListener("DOMContentLoaded", () => {
@@ -143,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentTheme = localStorage.getItem("theme") || "light";
     document.documentElement.setAttribute("data-theme", currentTheme);
     toggle.innerText = currentTheme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
-  
+
     toggle.addEventListener("click", () => {
         const newTheme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
         document.documentElement.setAttribute("data-theme", newTheme);
