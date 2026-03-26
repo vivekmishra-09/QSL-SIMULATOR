@@ -1,14 +1,15 @@
-
 export default async function handler(req, res) {
     try {
-        const response = await fetch(
-            "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='-32'&CENTER='500@399'&MAKE_EPHEM='YES'&EPHEM_TYPE='OBSERVER'&QUANTITIES='20'"
-        );
+        const now = new Date().toISOString();
 
+        const url = `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='-32'&EPHEM_TYPE=OBSERVER&CENTER='500@399'&START_TIME='${now}'&STOP_TIME='${now}'&STEP_SIZE='1 m'&QUANTITIES='20'`;
+
+        const response = await fetch(url);
         const data = await response.json();
 
         const text = data.result;
 
+        // extract distance properly
         const match = text.match(/(\d+\.\d+E\+\d+)/);
 
         if (match) {
