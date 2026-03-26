@@ -86,32 +86,41 @@ function getMarsOrbiterData() {
     document.getElementById("mars-data").innerHTML = dataHTML;
 }
 
-// === DEEP SPACE FUNCTION (UPDATED) ===
+// === DEEP SPACE FUNCTION (REAL PHYSICS - REFINED) ===
 function deepSpaceProbeData() {
 
-    let distance = getRealProbeDistance(); // 🔥 REAL MOTION
+    // === REAL DISTANCE ===
+    let distance = getRealProbeDistance();
     let signalDelay = distance / LIGHT_SPEED;
     let signalTime = signalDelay.toFixed(6);
 
+    // === CONTROLLED INTERFERENCE (PHYSICS-LIKE) ===
     let interference = getControlledNoise();
 
+    // === DYNAMIC LAMBDA ===
     let lambda = computeLambda(distance, interference);
 
-    let delta = signalDelay;
-    let qsl = 1 - Math.exp(-lambda * delta);
-    let qsu = Math.exp(-lambda * delta);
+    // === QSL CALCULATION ===
+    let qsl = 1 - Math.exp(-lambda * signalDelay);
+    let qsu = Math.exp(-lambda * signalDelay);
 
-    const dynamicVelocity = PROBE_VELOCITY + Math.sin(Date.now() / 10000000) * 2;
-    const receivedFreq = SIGNAL_FREQUENCY * (1 - dynamicVelocity / LIGHT_SPEED);
+    // === REALISTIC DOPPLER (SMALL VARIATION ONLY) ===
+    const velocityVariation = Math.sin(Date.now() / 20000000) * 0.5; // very small drift
+    const effectiveVelocity = PROBE_VELOCITY + velocityVariation;
+
+    const receivedFreq = SIGNAL_FREQUENCY * (1 - effectiveVelocity / LIGHT_SPEED);
     const deltaF = receivedFreq - SIGNAL_FREQUENCY;
 
+    // === BASELINE COMPARISON ===
     const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
     const dopplerDelta = Math.abs(receivedFreq - baseDoppler);
 
-    const anomaly = (qsl > 0.85 && dopplerDelta > 1e5)
+    // === ANOMALY LOGIC (STRICT) ===
+    const anomaly = (qsl > 0.85 && dopplerDelta > 5e4)
         ? "⚠️ Signal Disruption Detected"
         : "✅ Signal Stable";
 
+    // === OUTPUT ===
     const dataHTML = `
         📡 <strong>Distance:</strong> ${distance.toFixed(2)} km <br>
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
@@ -125,6 +134,7 @@ function deepSpaceProbeData() {
 
     document.getElementById("deep-space-data").innerHTML = dataHTML;
 }
+
 
 // === INIT ===
 fetchDSNData();
