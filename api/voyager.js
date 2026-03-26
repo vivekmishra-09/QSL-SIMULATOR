@@ -2,18 +2,31 @@ export default async function handler(req, res) {
     try {
         const now = new Date().toISOString();
 
-        const url = `https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='-32'&EPHEM_TYPE=OBSERVER&CENTER='500@399'&START_TIME='${now}'&STOP_TIME='${now}'&STEP_SIZE='1 m'&QUANTITIES='20'`;
+        const url = `https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='-32'&EPHEM_TYPE=OBSERVER&CENTER='500@399'&START_TIME='${now}'&STOP_TIME='${now}'&STEP_SIZE='1 m'&QUANTITIES='20'`;
 
         const response = await fetch(url);
-        const data = await response.json();
+        const text = await response.text();
 
-        const text = data.result;
+        // split lines
+        const lines = text.split("\n");
 
-        // extract distance properly
-        const match = text.match(/(\d+\.\d+E\+\d+)/);
+        let distance = null;
 
-        if (match) {
-            const distance = parseFloat(match[0]);
+        for (let line of lines) {
+            // look for line with AU distance
+            if (line.includes("AU")) {
+                const match = line.match(/([0-9]+\.[0-9]+)/);
+                if (match) {
+                    const distanceAU = parseFloat(match[1]);
+
+                    // convert AU → KM
+                    distance = distanceAU * 149597870;
+                    break;
+                }
+            }
+        }
+
+        if (distance) {
             return res.status(200).json({ distance });
         }
 
