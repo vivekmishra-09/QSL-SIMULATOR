@@ -40,17 +40,21 @@ function getControlledNoise() {
     return 5 + Math.sin(Date.now() / 2000) * 3;
 }
 
-// === REALISTIC PROBE DISTANCE MODEL ===
+// === REALISTIC PROBE DISTANCE MODEL (FIXED) ===
 function getRealProbeDistance() {
-    const baseDistance = 2.47e10; // Voyager-like distance (km)
+    const baseDistance = 2.47e10; // km (Voyager-like)
     const velocity = 17; // km/s
 
-    const timeSeconds = Date.now() / 1000;
+    const baseTime = 1700000000000; // fixed reference time
+    const t = (Date.now() - baseTime) / 1000;
 
-    let distance = baseDistance + (velocity * timeSeconds);
+    // linear outward motion
+    let distance = baseDistance + (velocity * t);
 
-    // small perturbation
-    distance += Math.sin(timeSeconds / 50000) * 5e6;
+    // positive-only perturbation (no backward motion)
+    let perturb = Math.abs(Math.sin(t / 50000)) * 5e5;
+
+    distance += perturb;
 
     return distance;
 }
@@ -86,41 +90,34 @@ function getMarsOrbiterData() {
     document.getElementById("mars-data").innerHTML = dataHTML;
 }
 
-// === DEEP SPACE FUNCTION (REAL PHYSICS - REFINED) ===
+// === DEEP SPACE FUNCTION (REAL PHYSICS - FINAL) ===
 function deepSpaceProbeData() {
 
-    // === REAL DISTANCE ===
     let distance = getRealProbeDistance();
     let signalDelay = distance / LIGHT_SPEED;
     let signalTime = signalDelay.toFixed(6);
 
-    // === CONTROLLED INTERFERENCE (PHYSICS-LIKE) ===
     let interference = getControlledNoise();
 
-    // === DYNAMIC LAMBDA ===
     let lambda = computeLambda(distance, interference);
 
-    // === QSL CALCULATION ===
     let qsl = 1 - Math.exp(-lambda * signalDelay);
     let qsu = Math.exp(-lambda * signalDelay);
 
-    // === REALISTIC DOPPLER (SMALL VARIATION ONLY) ===
-    const velocityVariation = Math.sin(Date.now() / 20000000) * 0.5; // very small drift
+    // realistic small velocity variation
+    const velocityVariation = Math.sin(Date.now() / 20000000) * 0.5;
     const effectiveVelocity = PROBE_VELOCITY + velocityVariation;
 
     const receivedFreq = SIGNAL_FREQUENCY * (1 - effectiveVelocity / LIGHT_SPEED);
     const deltaF = receivedFreq - SIGNAL_FREQUENCY;
 
-    // === BASELINE COMPARISON ===
     const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
     const dopplerDelta = Math.abs(receivedFreq - baseDoppler);
 
-    // === ANOMALY LOGIC (STRICT) ===
     const anomaly = (qsl > 0.85 && dopplerDelta > 5e4)
         ? "⚠️ Signal Disruption Detected"
         : "✅ Signal Stable";
 
-    // === OUTPUT ===
     const dataHTML = `
         📡 <strong>Distance:</strong> ${distance.toFixed(2)} km <br>
         ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
@@ -134,7 +131,6 @@ function deepSpaceProbeData() {
 
     document.getElementById("deep-space-data").innerHTML = dataHTML;
 }
-
 
 // === INIT ===
 fetchDSNData();
