@@ -1,10 +1,9 @@
 /*
- * Quantum Signal Loss (QSL) Simulator
- * Real Voyager + 3 Probe Localization (Final)
- */
+Quantum Signal Loss (QSL) Simulator - Real Voyager Integrated + Localization
+*/
 
 // === CONSTANTS ===
-const LIGHT_SPEED = 299792.458;
+const LIGHT_SPEED = 299792.458; 
 const EARTH_MARS_AVG_DISTANCE = 225000000;
 const MARS_ATMOSPHERIC_LOSS = 0.04;
 const MARS_VELOCITY = 24;
@@ -13,10 +12,9 @@ const SIGNAL_FREQUENCY = 8.4e9;
 
 const BASE_LAMBDA = 3.6e-7;
 
-// === REAL DATA ===
 let REAL_DISTANCE = null;
 
-// === FETCH VOYAGER ===
+// === FETCH REAL VOYAGER DATA ===
 async function updateVoyagerDistance() {
     try {
         const res = await fetch("/api/voyager");
@@ -43,7 +41,8 @@ function getControlledNoise() {
 function getFallbackDistance() {
     const baseDistance = 2.47e10;
     const velocity = 17;
-    const t = (Date.now() - 1700000000000) / 1000;
+    const baseTime = 1700000000000;
+    const t = (Date.now() - baseTime) / 1000;
 
     let distance = baseDistance + velocity * t;
     let perturb = Math.abs(Math.sin(t / 50000)) * 5e5;
@@ -56,7 +55,9 @@ function getRealProbeDistance() {
     return REAL_DISTANCE || getFallbackDistance();
 }
 
-// === QSL ===
+//////////////////////////////////////////////////////
+// 🔥 QSL FUNCTION
+//////////////////////////////////////////////////////
 function getQSL(distance) {
     let interference = getControlledNoise();
     let lambda = computeLambda(distance, interference);
@@ -64,7 +65,9 @@ function getQSL(distance) {
     return 1 - Math.exp(-lambda * delay);
 }
 
-// === YOUR EQUATION ===
+//////////////////////////////////////////////////////
+// 🔥 YOUR EQUATION
+//////////////////////////////////////////////////////
 function computeDdist(D1, Q1, D2, Q2) {
     if (Q1 >= 0.999999 || Q2 >= 0.999999) return null;
 
@@ -79,7 +82,9 @@ function computeDdist(D1, Q1, D2, Q2) {
     return Math.abs(num / den);
 }
 
-// === TRIANGULATION ===
+//////////////////////////////////////////////////////
+// 🔥 TRIANGULATION
+//////////////////////////////////////////////////////
 function triangulate(p1, p2, p3, r1, r2, r3) {
 
     const A = 2*(p2.x - p1.x);
@@ -99,7 +104,7 @@ function triangulate(p1, p2, p3, r1, r2, r3) {
     return { x, y };
 }
 
-// === MARS ===
+// === MARS FUNCTION ===
 function getMarsOrbiterData() {
     let distance = EARTH_MARS_AVG_DISTANCE + (Math.sin(Date.now() / 5000000) * 5000000);
     let signalTime = (distance / LIGHT_SPEED).toFixed(6);
@@ -127,10 +132,23 @@ function getMarsOrbiterData() {
     `;
 }
 
-// === DEEP SPACE + LOCALIZATION ===
+// === DEEP SPACE FUNCTION ===
 function deepSpaceProbeData() {
 
-    let D1 = getRealProbeDistance();
+    let distance = getRealProbeDistance();
+    let signalDelay = distance / LIGHT_SPEED;
+    let signalTime = signalDelay.toFixed(6);
+
+    let interference = getControlledNoise();
+    let lambda = computeLambda(distance, interference);
+
+    let qsl = 1 - Math.exp(-lambda * signalDelay);
+    let qsu = Math.exp(-lambda * signalDelay);
+
+    //////////////////////////////////////////////////////
+    // 🔥 LOCALIZATION ADD (SAFE)
+    //////////////////////////////////////////////////////
+    let D1 = distance;
     let D2 = D1 * 0.92;
     let D3 = D1 * 1.05;
 
@@ -159,22 +177,38 @@ function deepSpaceProbeData() {
             Y: ${(location.y/1e9).toFixed(2)} B km
         `;
     }
+    //////////////////////////////////////////////////////
 
-    let signalDelay = D1 / LIGHT_SPEED;
+    const velocityVariation = Math.sin(Date.now() / 20000000) * 0.5;
+    const effectiveVelocity = PROBE_VELOCITY + velocityVariation;
+
+    const receivedFreq = SIGNAL_FREQUENCY * (1 - effectiveVelocity / LIGHT_SPEED);
+    const deltaF = receivedFreq - SIGNAL_FREQUENCY;
+
+    const baseDoppler = SIGNAL_FREQUENCY * (1 - PROBE_VELOCITY / LIGHT_SPEED);
+    const dopplerDelta = Math.abs(receivedFreq - baseDoppler);
+
+    const anomaly = (qsl > 0.85 && dopplerDelta > 5e4)
+        ? "⚠️ Signal Disruption Detected"
+        : "✅ Signal Stable";
 
     document.getElementById("deep-space-data").innerHTML = `
-        📡 <strong>Distance:</strong> ${D1.toFixed(2)} km <br>
-        ⏳ <strong>Signal Delay:</strong> ${signalDelay.toFixed(6)} sec <br>
-        💠 <strong>QSL:</strong> ${Q1.toFixed(6)} <br>
-        📊 <strong>Status:</strong> Active <br>
+        📡 <strong>Distance:</strong> ${distance.toFixed(2)} km <br>
+        ⏳ <strong>Signal Delay:</strong> ${signalTime} sec <br>
+        💠 <strong>QSL:</strong> ${qsl.toFixed(6)} <br>
+        🧿 <strong>QSU:</strong> ${qsu.toFixed(6)} <br>
+        📈 <strong>Received Frequency:</strong> ${receivedFreq.toFixed(2)} Hz <br>
+        📊 <strong>Doppler Shift Δf:</strong> ${deltaF.toFixed(0)} Hz <br>
+        🕒 <strong>Last Updated:</strong> ${new Date().toUTCString()}<br>
+        🔵 <strong>Status:</strong> ${anomaly}
         <hr>
-        🧭 <strong>Localization:</strong><br> ${locText}
+        🧭 <strong>Localization:</strong><br>${locText}
     `;
 }
 
 // === INIT ===
 setInterval(getMarsOrbiterData, 5000);
-setInterval(deepSpaceProbeData, 5000);
+setInterval(deepSpaceProbeData, 15000);
 setInterval(updateVoyagerDistance, 10000);
 
 // === THEME ===
