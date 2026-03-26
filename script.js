@@ -152,9 +152,20 @@ function deepSpaceProbeData() {
     let D2 = D1 * 0.92;
     let D3 = D1 * 1.05;
 
-    let Q1 = getQSL(D1);
-    let Q2 = getQSL(D2);
-    let Q3 = getQSL(D3);
+// 🔥 DIFFERENT ENVIRONMENT FOR EACH PROBE
+let t = Date.now();
+
+let noise1 = 5 + Math.sin(t / 2000) * 3;
+let noise2 = 6 + Math.sin(t / 3000 + 1) * 2.5;
+let noise3 = 4 + Math.cos(t / 2500 + 2) * 3.5;
+
+let lambda1 = computeLambda(D1, noise1);
+let lambda2 = computeLambda(D2, noise2);
+let lambda3 = computeLambda(D3, noise3);
+
+let Q1 = 1 - Math.exp(-lambda1 * (D1 / LIGHT_SPEED));
+let Q2 = 1 - Math.exp(-lambda2 * (D2 / LIGHT_SPEED));
+let Q3 = 1 - Math.exp(-lambda3 * (D3 / LIGHT_SPEED));
 
     let D12 = computeDdist(D1, Q1, D2, Q2);
     let D23 = computeDdist(D2, Q2, D3, Q3);
