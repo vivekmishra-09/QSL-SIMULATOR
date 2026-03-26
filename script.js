@@ -159,9 +159,17 @@ function deepSpaceProbeData() {
     let D12 = computeDdist(D1, Q1, D2, Q2);
     let D23 = computeDdist(D2, Q2, D3, Q3);
 
-    const p1 = { x: D1, y: 0 };
-    const p2 = { x: D2, y: 5e9 };
-    const p3 = { x: D3, y: -5e9 };
+const p1 = { x: D1, y: 0 };
+
+const p2 = { 
+    x: D2 * Math.cos(Math.PI / 6), 
+    y: D2 * Math.sin(Math.PI / 6) 
+};
+
+const p3 = { 
+    x: D3 * Math.cos(-Math.PI / 4), 
+    y: D3 * Math.sin(-Math.PI / 4) 
+};
 
     let location = null;
 
