@@ -13,10 +13,8 @@
     <button id="themeToggle"></button>
     <header style="text-align: center; padding: 30px 20px;">
         
-        <h1 style="font-size: 2.5em; margin-bottom: 10px;"></h1style>Quantum Signal Loss (QSL)</h1>
-      </div>
+        <h1 style="font-size: 2.5em; margin-bottom: 10px;">Quantum Signal Loss (QSL)</h1>
       
-  
         <p style="font-size: 1.2em; color: #888;">
             Introducing the world's first scalar-based simulation framework for quantum signal degradation in deep space environments.
           </p>          
@@ -79,6 +77,98 @@
     </div>
 </section>
 
+<!-- ============================================================
+     ADVANCED LOCALIZATION MODULE (NEW)
+     ============================================================ -->
+<section id="localization" style="padding: 20px; max-width: 1100px; margin: auto;">
+
+  <h2 class="deep-space-heading" style="margin-top: 10px;">Advanced Probe Localization System</h2>
+  <p style="text-align:center; font-size: 1rem; color: #aaa; max-width: 720px; margin: 0 auto 30px;">
+    Multi-probe triangulation using QSL-derived inter-probe distances, full 3D heliocentric coordinates,
+    uncertainty radius estimation, and a live solar system map — all computed in real time from the QSL scalar framework.
+  </p>
+
+  <!-- Probe selector tabs -->
+  <div class="loc-probe-tabs" id="locProbeTabs">
+    <button class="loc-probe-tab active" onclick="locSelectProbe(0)">Voyager 1</button>
+    <button class="loc-probe-tab" onclick="locSelectProbe(1)">Voyager 2</button>
+    <button class="loc-probe-tab" onclick="locSelectProbe(2)">New Horizons</button>
+  </div>
+
+  <!-- Solar system map -->
+  <canvas id="locSolarMap"></canvas>
+
+  <div class="loc-legend">
+    <div class="loc-legend-item"><span class="loc-legend-dot" style="background:#FFD700"></span>Sun</div>
+    <div class="loc-legend-item"><span class="loc-legend-dot" style="background:#4fc3f7"></span>Voyager 1</div>
+    <div class="loc-legend-item"><span class="loc-legend-dot" style="background:#81c784"></span>Voyager 2</div>
+    <div class="loc-legend-item"><span class="loc-legend-dot" style="background:#f48fb1"></span>New Horizons</div>
+    <div class="loc-legend-item"><span class="loc-legend-dot" style="border: 1px dashed #ffd700; background: rgba(255,200,0,0.15)"></span>Uncertainty radius</div>
+  </div>
+
+  <!-- 3D Coordinates panel -->
+  <div class="loc-panel">
+    <div class="loc-panel-title">3D Heliocentric Localization — <span id="locProbeName">Voyager 1</span></div>
+    <div class="loc-coord-grid">
+      <div class="loc-coord-item">
+        <div class="loc-coord-label">X coordinate</div>
+        <div class="loc-coord-val" id="locX" style="color:#4fc3f7">—</div>
+      </div>
+      <div class="loc-coord-item">
+        <div class="loc-coord-label">Y coordinate</div>
+        <div class="loc-coord-val" id="locY" style="color:#81c784">—</div>
+      </div>
+      <div class="loc-coord-item">
+        <div class="loc-coord-label">Z coordinate (elevation)</div>
+        <div class="loc-coord-val" id="locZ" style="color:#f48fb1">—</div>
+      </div>
+      <div class="loc-coord-item">
+        <div class="loc-coord-label">Radial distance from Sun</div>
+        <div class="loc-coord-val" id="locR" style="color:#FFD700">—</div>
+      </div>
+    </div>
+    <div class="loc-uncertainty-box">
+      ⚠️ Uncertainty radius (1σ): <strong id="locUncertaintyVal">—</strong>
+    </div>
+  </div>
+
+  <!-- QSL / QSU integrity panel -->
+  <div class="loc-panel">
+    <div class="loc-panel-title">QSL / QSU Signal Integrity</div>
+    <div class="loc-bar-wrap">
+      <div class="loc-bar-label"><span>QSL (Signal Loss)</span><span id="locQslVal">—</span></div>
+      <div class="loc-bar-bg"><div class="loc-bar-fill" id="locQslBar" style="background:#e57373;width:0%"></div></div>
+    </div>
+    <div class="loc-bar-wrap" style="margin-top:10px">
+      <div class="loc-bar-label"><span>QSU (Signal Unity)</span><span id="locQsuVal">—</span></div>
+      <div class="loc-bar-bg"><div class="loc-bar-fill" id="locQsuBar" style="background:#4fc3f7;width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Triangulation panel -->
+  <div class="loc-panel">
+    <div class="loc-panel-title">Multi-Probe Triangulation (3-Receiver Network)</div>
+    <div class="loc-metrics-grid">
+      <div class="loc-metric"><div class="loc-metric-label">Probe P1 → Sun dist.</div><div class="loc-metric-val" id="locD1">—</div></div>
+      <div class="loc-metric"><div class="loc-metric-label">Probe P2 → Sun dist.</div><div class="loc-metric-val" id="locD2">—</div></div>
+      <div class="loc-metric"><div class="loc-metric-label">Probe P3 → Sun dist.</div><div class="loc-metric-val" id="locD3">—</div></div>
+      <div class="loc-metric"><div class="loc-metric-label">D(P1↔P2) QSL-derived</div><div class="loc-metric-val" id="locD12">—</div></div>
+      <div class="loc-metric"><div class="loc-metric-label">D(P2↔P3) QSL-derived</div><div class="loc-metric-val" id="locD23">—</div></div>
+      <div class="loc-metric"><div class="loc-metric-label">Triangulation error</div><div class="loc-metric-val" id="locTerr">—</div></div>
+    </div>
+  </div>
+
+  <!-- Raw telemetry panel -->
+  <div class="loc-panel">
+    <div class="loc-panel-title">Raw Telemetry — Research Grade</div>
+    <pre id="locRawTelemetry" class="loc-telemetry"></pre>
+  </div>
+
+</section>
+<!-- ============================================================
+     END ADVANCED LOCALIZATION MODULE
+     ============================================================ -->
+
 <!--About the Creator Section -->
     <section class="about-creator">
         <h2>About the Creator</h2>
@@ -87,9 +177,9 @@
         </p>
       
         <p>
-          I’m the creator of <strong>IMF–GDD</strong> Physcics Theory.
+          I'm the creator of <strong>IMF–GDD</strong> Physcics Theory.
             
-          Now, with <strong>QSL</strong>, I’ve developed a scalar-based simulation framework that models quantum signal degradation in extreme cosmic environments.
+          Now, with <strong>QSL</strong>, I've developed a scalar-based simulation framework that models quantum signal degradation in extreme cosmic environments.
         </p>
 
     <p style="margin-top: 30px; font-size: 1rem; color: #aaa;">"Bringing space to young minds, one line of code at a time." ✨</p>
